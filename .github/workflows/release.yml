@@ -52,7 +52,9 @@ jobs:
         run: |
           set -eu
           zip_name="ClearAndReload-${{ steps.v.outputs.tag }}.zip"
-          zip -r "$zip_name" manifest.json background.js icons
+          mkdir ClearAndReload
+          cp -r manifest.json background.js icons ClearAndReload/
+          zip -r "$zip_name" ClearAndReload
           echo "ZIP_NAME=$zip_name" >> "$GITHUB_ENV"
           unzip -l "$zip_name"
 

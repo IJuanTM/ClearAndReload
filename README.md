@@ -23,12 +23,12 @@ A Chromium extension that wipes everything the current site has stored in your b
 
 ## Installation
 
-1. Download `ClearAndReload-vX.Y.Z.zip` from the [latest release](https://github.com/IJuanTM/ClearAndReload/releases/latest) and extract it somewhere permanent. The browser loads the extension from that folder, so don't delete it afterwards.
+1. Download `ClearAndReload-vX.Y.Z.zip` from the [latest release](https://github.com/IJuanTM/ClearAndReload/releases/latest) and extract the `ClearAndReload` folder somewhere permanent. The browser loads the extension from that folder, so don't delete it afterwards.
 2. Open `chrome://extensions` (`edge://extensions` in Edge) and turn on **Developer mode**.
-3. Click **Load unpacked** and pick the extracted folder.
+3. Drag the `ClearAndReload` folder onto the page, or click **Load unpacked** and pick it.
 4. Optionally pin the icon to the toolbar.
 
-To update, extract the new zip over the old folder and click the reload button on the extension's card in `chrome://extensions`.
+To update, extract the new `ClearAndReload` folder over the old one and click the reload button on the extension's card in `chrome://extensions`.
 
 ---
 
