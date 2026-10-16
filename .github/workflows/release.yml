@@ -1,0 +1,67 @@
+name: Release
+
+# Publishes a GitHub Release with a ready-to-load ClearAndReload-v<version>.zip
+# whenever the version in manifest.json names a version that has no release yet.
+# Bump the version, commit, push to main - the release builds itself.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - manifest.json
+      - background.js
+      - icons/**
+      - .github/workflows/release.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Read version
+        id: v
+        run: |
+          version=$(jq -r '.version // empty' manifest.json)
+          if [ -z "$version" ]; then
+            echo "::error::could not parse version from manifest.json"
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+          echo "Version: $version"
+
+      - name: Check for existing release
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "${{ steps.v.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "Release ${{ steps.v.outputs.tag }} already exists - nothing to do."
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build zip
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          set -eu
+          zip_name="ClearAndReload-${{ steps.v.outputs.tag }}.zip"
+          zip -r "$zip_name" manifest.json background.js icons
+          echo "ZIP_NAME=$zip_name" >> "$GITHUB_ENV"
+          unzip -l "$zip_name"
+
+      - name: Create release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.v.outputs.tag }}" "$ZIP_NAME" \
+            --target "${{ github.sha }}" \
+            --title "${{ steps.v.outputs.tag }}" \
+            --generate-notes
